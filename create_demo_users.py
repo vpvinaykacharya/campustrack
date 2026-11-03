@@ -1,49 +1,53 @@
-from getpass import getpass
-
 from database import SessionLocal
 from models import User, Teacher, Student, Subject
 from auth import hash_password
 
+# Demo login credentials
+TEACHER_USERNAME = "teacher_demo"
+TEACHER_PASSWORD = "Teacher@123"
+
+STUDENT_USERNAME = "student_demo"
+STUDENT_PASSWORD = "Student@123"
 
 db = SessionLocal()
 
 try:
-    # Find existing demo accounts
+    # Find existing demo users
     teacher_user = db.query(User).filter(
-        User.username == "teacher_demo"
+        User.username == TEACHER_USERNAME
     ).first()
 
     student_user = db.query(User).filter(
-        User.username == "student_demo"
+        User.username == STUDENT_USERNAME
     ).first()
 
-    # Create the demo teacher account if it does not exist
-    if not teacher_user:
-        teacher_password = getpass("Set demo teacher password: ")
-
+    # Create or reset teacher account
+    if teacher_user:
+        teacher_user.password_hash = hash_password(TEACHER_PASSWORD)
+        teacher_user.role = "teacher"
+    else:
         teacher_user = User(
-            username="teacher_demo",
-            password_hash=hash_password(teacher_password),
+            username=TEACHER_USERNAME,
+            password_hash=hash_password(TEACHER_PASSWORD),
             role="teacher"
         )
-
         db.add(teacher_user)
         db.flush()
 
-    # Create the demo student account if it does not exist
-    if not student_user:
-        student_password = getpass("Set demo student password: ")
-
+    # Create or reset student account
+    if student_user:
+        student_user.password_hash = hash_password(STUDENT_PASSWORD)
+        student_user.role = "student"
+    else:
         student_user = User(
-            username="student_demo",
-            password_hash=hash_password(student_password),
+            username=STUDENT_USERNAME,
+            password_hash=hash_password(STUDENT_PASSWORD),
             role="student"
         )
-
         db.add(student_user)
         db.flush()
 
-    # Find the existing teacher and student profiles
+    # Find existing profiles
     teacher = db.query(Teacher).filter(
         Teacher.employee_id == "T001"
     ).first()
@@ -58,11 +62,11 @@ try:
     if not student:
         raise Exception("Student profile DEMO001 was not found.")
 
-    # Link accounts to their profiles
+    # Link accounts to profiles
     teacher.user_id = teacher_user.user_id
     student.user_id = student_user.user_id
 
-    # Assign the demo teacher to all sample subjects
+    # Assign sample subjects to demo teacher
     db.query(Subject).update(
         {Subject.teacher_id: teacher.teacher_id},
         synchronize_session=False
@@ -72,34 +76,13 @@ try:
     db.commit()
 
     print("\nDemo accounts are ready!")
-    print("Teacher username: teacher_demo")
-    print("Student username: student_demo")
+    print("Teacher username:", TEACHER_USERNAME)
+    print("Teacher password:", TEACHER_PASSWORD)
+    print("Student username:", STUDENT_USERNAME)
+    print("Student password:", STUDENT_PASSWORD)
 
-    # Display teacher profile
-    print("\n--- Teacher Profile ---")
-    print(
-        "Teacher ID:",
-        teacher.teacher_id,
-        "| Employee ID:",
-        teacher.employee_id,
-        "| Name:",
-        teacher.full_name
-    )
-
-    # Display subject assignments
-    print("\n--- Subject Assignments ---")
-
-    subjects = db.query(Subject).all()
-
-    for subject in subjects:
-        print(
-            "Subject ID:",
-            subject.subject_id,
-            "| Subject:",
-            subject.subject_name,
-            "| Assigned Teacher ID:",
-            subject.teacher_id
-        )
+    print("\nTeacher profile:", teacher.full_name)
+    print("Student profile:", student.full_name)
 
 except Exception as e:
     db.rollback()
