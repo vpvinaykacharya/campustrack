@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from fastapi import Form, Depends
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from database import SessionLocal
+from database import SessionLocal,Base
 from models import (
     User,
     Student,
@@ -20,6 +20,7 @@ from models import (
     AttendanceSession,
     AttendanceRecord
 )
+Base.metadata.create_all(bind=engine)
 from datetime import date
 from fastapi import HTTPException
 from auth import verify_password
