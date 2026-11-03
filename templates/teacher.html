@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard | CampusTrack</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="dashboard">
+
+        <aside class="sidebar">
+            <h2>CampusTrack</h2>
+
+            <nav>
+                <a href="/teacher" class="active">Dashboard</a>
+                <a href="/take-attendance">Take Attendance</a>
+                <a href="/attendance-records">Attendance Records</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                College Attendance System
+            </div>
+        </aside>
+
+        <main class="dashboard-content">
+
+            <header class="dashboard-header">
+                <div>
+                    <h1>Teacher Dashboard</h1>
+                    <p>Welcome back, Teacher!</p>
+                </div>
+
+                <div class="profile">
+                    <span class="profile-icon">T</span>
+                    <span>Teacher</span>
+                </div>
+            </header>
+
+            <section class="welcome-section">
+                <h2>Welcome to CampusTrack 👋</h2>
+                <p>
+                    Manage your classes, mark attendance,
+                    and view attendance records.
+                </p>
+            </section>
+
+            <section class="dashboard-grid">
+
+                <div class="dashboard-card">
+                    <div class="card-icon">✓</div>
+                    <h3>Attendance Management</h3>
+                    <p>
+                        Mark students as Present or Absent
+                        for your assigned subjects.
+                    </p>
+
+                    <a href="/take-attendance" class="button">
+                        Take Attendance
+                    </a>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon">▤</div>
+                    <h3>Attendance Records</h3>
+                    <p>
+                        View attendance records by subject
+                        and date.
+                    </p>
+
+                    <a href="/attendance-records" class="button">
+                        View Records
+                    </a>
+                </div>
+
+            </section>
+
+            <section class="recent-section">
+                <h3>Quick Guide</h3>
+
+                <div class="guide-item">
+                    <span class="guide-number">1</span>
+                    <div>
+                        <strong>Select a subject</strong>
+                        <p>Choose the subject and class for attendance.</p>
+                    </div>
+                </div>
+
+                <div class="guide-item">
+                    <span class="guide-number">2</span>
+                    <div>
+                        <strong>Mark attendance</strong>
+                        <p>Set each student as Present or Absent.</p>
+                    </div>
+                </div>
+
+                <div class="guide-item">
+                    <span class="guide-number">3</span>
+                    <div>
+                        <strong>Save attendance</strong>
+                        <p>Save the entries and view them in records.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>

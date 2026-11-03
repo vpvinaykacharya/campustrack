@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Track | Login</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #eef4ff;
+        }
+
+        .login-box {
+            width: 380px;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1769e0;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #1769e0;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #1769e0;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1052b5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #888;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-box">
+
+        <h1>Campus Track</h1>
+        <p class="subtitle">College Attendance Management</p>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+       
+        <form action="/login" method="POST">
+           
+            <label>Username</label>
+            <input type="text" name="username"
+                   placeholder="Enter username" required>
+
+            <label>Password</label>
+            <input type="password" name="password"
+                   placeholder="Enter password" required>
+
+            <button type="submit">Login</button>
+
+        </form>
+
+        <div class="footer">
+            Campus Track © 2026
+        </div>
+
+    </div>
+
+</body>
+</html>

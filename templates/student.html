@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | CampusTrack</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="dashboard">
+
+        <aside class="sidebar">
+            <h2>CampusTrack</h2>
+
+            <nav>
+                <a href="/student" class="active">Dashboard</a>
+                <a href="/attendance-records">Attendance Records</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                College Attendance System
+            </div>
+        </aside>
+
+        <main class="dashboard-content">
+
+            <header class="dashboard-header">
+                <div>
+                    <h1>Student Dashboard</h1>
+                    <p>Welcome back to CampusTrack!</p>
+                </div>
+
+                <div class="profile">
+                    <span class="profile-icon">S</span>
+                    <span>Student</span>
+                </div>
+            </header>
+
+            <section class="welcome-section">
+                <h2>Welcome, Student! 👋</h2>
+                <p>
+                    Track your attendance, review your class history,
+                    and stay updated with your academic progress.
+                </p>
+            </section>
+
+            <section class="dashboard-grid">
+
+                <div class="dashboard-card">
+                    <div class="card-icon">✓</div>
+                    <h3>Attendance Overview</h3>
+                    <p>
+                        Keep track of your attendance status
+                        for your classes.
+                    </p>
+                    <a href="/attendance-records" class="button">
+                        View Attendance
+                    </a>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon">▤</div>
+                    <h3>Attendance History</h3>
+                    <p>
+                        Review attendance records by subject
+                        and date.
+                    </p>
+                    <a href="/attendance-records" class="button">
+                        View Records
+                    </a>
+                </div>
+
+            </section>
+
+            <section class="recent-section">
+                <h3>Quick Guide</h3>
+
+                <div class="guide-item">
+                    <span class="guide-number">1</span>
+                    <div>
+                        <strong>Check your attendance</strong>
+                        <p>Review your attendance records regularly.</p>
+                    </div>
+                </div>
+
+                <div class="guide-item">
+                    <span class="guide-number">2</span>
+                    <div>
+                        <strong>Monitor your progress</strong>
+                        <p>Stay informed about your class attendance.</p>
+                    </div>
+                </div>
+
+                <div class="guide-item">
+                    <span class="guide-number">3</span>
+                    <div>
+                        <strong>Stay up to date</strong>
+                        <p>Keep track of your attendance history.</p>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>

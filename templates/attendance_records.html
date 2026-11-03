@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Records | CampusTrack</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="dashboard">
+
+        <aside class="sidebar">
+            <h2>CampusTrack</h2>
+
+            <nav>
+                <a href="/teacher">Dashboard</a>
+                <a href="/take-attendance">Take Attendance</a>
+                <a href="/attendance-records" class="active">Attendance Records</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                College Attendance System
+            </div>
+        </aside>
+
+        <main class="dashboard-content">
+
+            <header class="dashboard-header">
+                <div>
+                    <h1>Attendance Records</h1>
+                    <p>View and filter your students' attendance history.</p>
+                </div>
+
+                <div class="profile">
+                    <span class="profile-icon">T</span>
+                    <span>Teacher</span>
+                </div>
+            </header>
+
+            <section class="records-panel">
+
+                <div class="records-heading">
+                    <div>
+                        <h2>Attendance Overview</h2>
+                        <p>Filter records by subject or attendance date.</p>
+                    </div>
+                </div>
+
+                <form action="/attendance-records" method="GET" class="records-filter">
+
+                    <div class="filter-group">
+                        <label for="subject_id">Subject</label>
+
+                        <select name="subject_id" id="subject_id">
+                            <option value="">All Subjects</option>
+
+                            {% for subject in subjects %}
+                                <option
+                                    value="{{ subject.subject_id }}"
+                                    {% if selected_subject_id == subject.subject_id %}selected{% endif %}
+                                >
+                                    {{ subject.subject_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="record_date">Date</label>
+
+                        <input
+                            type="date"
+                            name="record_date"
+                            id="record_date"
+                            value="{{ selected_date or '' }}"
+                        >
+                    </div>
+
+                    <div class="filter-buttons">
+                        <button type="submit" class="button">
+                            Filter
+                        </button>
+
+                        <a href="/attendance-records" class="button button-secondary">
+                            Clear Filters
+                        </a>
+                    </div>
+
+                </form>
+
+                {% if records %}
+
+                <div class="records-table-wrapper">
+                    <table class="records-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Period</th>
+                                <th>Subject</th>
+                                <th>Register Number</th>
+                                <th>Student Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for session, subject, record, student in records %}
+
+                            <tr>
+                                <td>{{ session.session_date }}</td>
+                                <td>{{ session.period_number }}</td>
+                                <td>{{ subject.subject_name }}</td>
+                                <td>{{ student.register_number }}</td>
+                                <td>{{ student.full_name }}</td>
+
+                                <td>
+                                    {% if record.status == "P" %}
+                                        <span class="record-status status-present">
+                                            Present
+                                        </span>
+                                    {% else %}
+                                        <span class="record-status status-absent">
+                                            Absent
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% else %}
+
+                <div class="no-records">
+                    <div class="no-records-icon">▤</div>
+                    <h3>No Attendance Records</h3>
+                    <p>No records were found for the selected filters.</p>
+                    <a href="/attendance-records" class="button">
+                        View All Records
+                    </a>
+                </div>
+
+                {% endif %}
+
+            </section>
+
+            <p class="records-back">
+                <a href="/teacher">← Back to Dashboard</a>
+            </p>
+
+        </main>
+    </div>
+</body>
+</html>

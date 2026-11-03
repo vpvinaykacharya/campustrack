@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Attendance | CampusTrack</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="dashboard">
+
+        <aside class="sidebar">
+            <h2>CampusTrack</h2>
+
+            <nav>
+                <a href="/teacher">Dashboard</a>
+                <a href="/take-attendance" class="active">Take Attendance</a>
+                <a href="/attendance-records">Attendance Records</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                College Attendance System
+            </div>
+        </aside>
+
+        <main class="dashboard-content">
+
+            <header class="dashboard-header">
+                <div>
+                    <h1>Take Attendance</h1>
+                    <p>Mark students present or absent for your class.</p>
+                </div>
+
+                <div class="profile">
+                    <span class="profile-icon">T</span>
+                    <span>Teacher</span>
+                </div>
+            </header>
+
+            <section class="attendance-panel">
+
+                <div class="panel-heading">
+                    <div>
+                        <h2>Attendance Sheet</h2>
+                        <p>Select the subject, date, and period.</p>
+                    </div>
+                </div>
+
+                <form action="/save-attendance" method="POST">
+
+                    <div class="attendance-details">
+
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+
+                            <select id="subject" name="subject_id" required>
+                                <option value="">Select Subject</option>
+                                <option value="1">Data Structure</option>
+                                <option value="2">HTML, VBScript & JavaScript</option>
+                                <option value="3">Cloud Security</option>
+                                <option value="4">DS Lab</option>
+                                <option value="5">HTML/JavaScript Lab</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="date">Attendance Date</label>
+
+                            <input
+                                type="date"
+                                id="date"
+                                name="session_date"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="period">Period</label>
+
+                            <input
+                                type="number"
+                                id="period"
+                                name="period_number"
+                                min="1"
+                                max="10"
+                                value="1"
+                                required
+                            >
+                        </div>
+
+                    </div>
+
+                    <div class="student-list-heading">
+                        <h3>Students</h3>
+                        <span>Choose attendance status</span>
+                    </div>
+
+                    <div class="student-list">
+
+                        {% for student in students %}
+
+                        <div class="student-row">
+
+                            <div class="student-info">
+                                <span class="student-avatar">
+                                    {{ student.full_name[0] }}
+                                </span>
+
+                                <div>
+                                    <strong>{{ student.full_name }}</strong>
+                                    <small>{{ student.register_number }}</small>
+                                </div>
+                            </div>
+
+                            <div class="attendance-options">
+
+                                <label class="status-option present-option">
+                                    <input
+                                        type="radio"
+                                        name="status_{{ student.student_id }}"
+                                        value="P"
+                                        checked
+                                    >
+                                    <span>Present</span>
+                                </label>
+
+                                <label class="status-option absent-option">
+                                    <input
+                                        type="radio"
+                                        name="status_{{ student.student_id }}"
+                                        value="A"
+                                    >
+                                    <span>Absent</span>
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                        {% else %}
+
+                        <p class="empty-message">
+                            No students found in the database.
+                        </p>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <div class="attendance-actions">
+                        <a href="/teacher" class="button button-secondary">
+                            Back to Dashboard
+                        </a>
+
+                        <button type="submit" class="button">
+                            Save Attendance
+                        </button>
+                    </div>
+
+                </form>
+
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>
