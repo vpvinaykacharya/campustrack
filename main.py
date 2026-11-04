@@ -1,17 +1,13 @@
 from starlette.middleware.sessions import SessionMiddleware
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request, Form, Depends, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi import Request
-from database import engine
+
 from sqlalchemy import text
-import os
-from dotenv import load_dotenv
-from fastapi import Form, Depends
-from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from database import SessionLocal,Base
+
+from database import engine, SessionLocal, Base
 from models import (
     User,
     Student,
@@ -20,29 +16,49 @@ from models import (
     AttendanceSession,
     AttendanceRecord
 )
-Base.metadata.create_all(bind=engine)
-from datetime import date
-from fastapi import HTTPException
-from auth import verify_password
-app = FastAPI(title="CampusTrack")
 
+from auth import verify_password
+
+from datetime import date
+import os
+from dotenv import load_dotenv
 
 
 load_dotenv()
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="CampusTrack")
+
 
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.getenv("SECRET_KEY")
 )
+
+
 # Static files and HTML templates
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount(
+    "/static",
+    StaticFiles(directory="static"),
+    name="static"
+)
+
 templates = Jinja2Templates(directory="templates")
+
+
 def get_db():
     db = SessionLocal()
+
     try:
         yield db
     finally:
         db.close()
+
+
+# --------------------------------------------------
+# HOME
+# --------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
@@ -52,6 +68,10 @@ def home(request: Request):
         context={}
     )
 
+
+# --------------------------------------------------
+# DATABASE TEST
+# --------------------------------------------------
 
 @app.get("/test-db")
 def test_database():
@@ -66,9 +86,20 @@ def test_database():
     }
 
 
+# --------------------------------------------------
+# HEALTH CHECK
+# --------------------------------------------------
+
 @app.get("/health")
 def health():
-    return {"status": "CampusTrack is running"}
+    return {
+        "status": "CampusTrack is running"
+    }
+
+
+# --------------------------------------------------
+# LOGIN
+# --------------------------------------------------
 
 @app.post("/login")
 def login(
@@ -81,29 +112,51 @@ def login(
         User.username == username
     ).first()
 
-    if not user or not verify_password(password, user.password_hash):
+    if not user or not verify_password(
+        password,
+        user.password_hash
+    ):
         return templates.TemplateResponse(
             request=request,
             name="login.html",
-            context={"error": "Invalid username or password"}
+            context={
+                "error": "Invalid username or password"
+            }
         )
 
     request.session["user_id"] = user.user_id
     request.session["role"] = user.role
 
     if user.role == "teacher":
-        return RedirectResponse(url="/teacher", status_code=303)
+        return RedirectResponse(
+            url="/teacher",
+            status_code=303
+        )
 
     elif user.role == "student":
-        return RedirectResponse(url="/student", status_code=303)
+        return RedirectResponse(
+            url="/student",
+            status_code=303
+        )
 
     else:
-        return RedirectResponse(url="/admin", status_code=303)
+        return RedirectResponse(
+            url="/admin",
+            status_code=303
+        )
+
+
+# --------------------------------------------------
+# TEACHER DASHBOARD
+# --------------------------------------------------
 
 @app.get("/teacher")
 def teacher_dashboard(request: Request):
     if request.session.get("role") != "teacher":
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(
+            url="/",
+            status_code=303
+        )
 
     return templates.TemplateResponse(
         request=request,
@@ -112,10 +165,17 @@ def teacher_dashboard(request: Request):
     )
 
 
+# --------------------------------------------------
+# STUDENT DASHBOARD
+# --------------------------------------------------
+
 @app.get("/student")
 def student_dashboard(request: Request):
     if request.session.get("role") != "student":
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(
+            url="/",
+            status_code=303
+        )
 
     return templates.TemplateResponse(
         request=request,
@@ -124,12 +184,26 @@ def student_dashboard(request: Request):
     )
 
 
+# --------------------------------------------------
+# ADMIN DASHBOARD
+# --------------------------------------------------
+
 @app.get("/admin")
 def admin_dashboard(request: Request):
     if request.session.get("role") != "admin":
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(
+            url="/",
+            status_code=303
+        )
 
-    return {"message": "Admin dashboard coming soon"}
+    return {
+        "message": "Admin dashboard coming soon"
+    }
+
+
+# --------------------------------------------------
+# TAKE ATTENDANCE PAGE
+# --------------------------------------------------
 
 @app.get("/take-attendance")
 def take_attendance_page(
@@ -137,17 +211,51 @@ def take_attendance_page(
     db: Session = Depends(get_db)
 ):
     if request.session.get("role") != "teacher":
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(
+            url="/",
+            status_code=303
+        )
 
-    students = db.query(Student).order_by(
+    teacher_user_id = request.session.get("user_id")
+
+    teacher = db.query(Teacher).filter(
+        Teacher.user_id == teacher_user_id
+    ).first()
+
+    if not teacher:
+        raise HTTPException(
+            status_code=404,
+            detail="Teacher profile not found."
+        )
+
+    # Demo class students
+    students = db.query(Student).filter(
+        Student.class_id == 1
+    ).order_by(
         Student.register_number
+    ).all()
+
+    # Subjects assigned to the logged-in teacher
+    subjects = db.query(Subject).filter(
+        Subject.teacher_id == teacher.teacher_id
+    ).order_by(
+        Subject.subject_name
     ).all()
 
     return templates.TemplateResponse(
         request=request,
         name="take_attendance.html",
-        context={"students": students}
+        context={
+            "students": students,
+            "subjects": subjects
+        }
     )
+
+
+# --------------------------------------------------
+# SAVE ATTENDANCE
+# --------------------------------------------------
+
 @app.post("/save-attendance")
 async def save_attendance(
     request: Request,
@@ -157,7 +265,10 @@ async def save_attendance(
     db: Session = Depends(get_db)
 ):
     if request.session.get("role") != "teacher":
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(
+            url="/",
+            status_code=303
+        )
 
     teacher_user_id = request.session.get("user_id")
 
@@ -188,7 +299,9 @@ async def save_attendance(
         )
 
     try:
-        attendance_session = db.query(AttendanceSession).filter(
+        attendance_session = db.query(
+            AttendanceSession
+        ).filter(
             AttendanceSession.subject_id == subject_id,
             AttendanceSession.session_date == session_date,
             AttendanceSession.period_number == period_number
@@ -208,7 +321,9 @@ async def save_attendance(
         students = db.query(Student).filter(
             Student.class_id == subject.class_id
         ).all()
+
         form_data = await request.form()
+
         for student in students:
             status = form_data.get(
                 f"status_{student.student_id}"
@@ -217,19 +332,25 @@ async def save_attendance(
             if status not in ["P", "A"]:
                 continue
 
-            record = db.query(AttendanceRecord).filter(
-                AttendanceRecord.session_id == attendance_session.session_id,
-                AttendanceRecord.student_id == student.student_id
+            record = db.query(
+                AttendanceRecord
+            ).filter(
+                AttendanceRecord.session_id
+                == attendance_session.session_id,
+                AttendanceRecord.student_id
+                == student.student_id
             ).first()
 
             if record:
                 record.status = status
+
             else:
                 record = AttendanceRecord(
                     session_id=attendance_session.session_id,
                     student_id=student.student_id,
                     status=status
                 )
+
                 db.add(record)
 
         db.commit()
@@ -242,7 +363,16 @@ async def save_attendance(
         url="/teacher",
         status_code=303
     )
-@app.get("/attendance-records", response_class=HTMLResponse)
+
+
+# --------------------------------------------------
+# ATTENDANCE RECORDS
+# --------------------------------------------------
+
+@app.get(
+    "/attendance-records",
+    response_class=HTMLResponse
+)
 def attendance_records_page(
     request: Request,
     subject_id: int = None,
@@ -250,7 +380,10 @@ def attendance_records_page(
     db: Session = Depends(get_db)
 ):
     if request.session.get("role") != "teacher":
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(
+            url="/",
+            status_code=303
+        )
 
     teacher_user_id = request.session.get("user_id")
 
@@ -271,14 +404,31 @@ def attendance_records_page(
             AttendanceRecord,
             Student
         )
-        .join(Subject, AttendanceSession.subject_id == Subject.subject_id)
-        .join(AttendanceRecord, AttendanceSession.session_id == AttendanceRecord.session_id)
-        .join(Student, AttendanceRecord.student_id == Student.student_id)
-        .filter(AttendanceSession.teacher_id == teacher.teacher_id)
+        .join(
+            Subject,
+            AttendanceSession.subject_id
+            == Subject.subject_id
+        )
+        .join(
+            AttendanceRecord,
+            AttendanceSession.session_id
+            == AttendanceRecord.session_id
+        )
+        .join(
+            Student,
+            AttendanceRecord.student_id
+            == Student.student_id
+        )
+        .filter(
+            AttendanceSession.teacher_id
+            == teacher.teacher_id
+        )
     )
 
     if subject_id is not None:
-        query = query.filter(Subject.subject_id == subject_id)
+        query = query.filter(
+            Subject.subject_id == subject_id
+        )
 
     if record_date is not None:
         query = query.filter(
@@ -292,7 +442,9 @@ def attendance_records_page(
 
     subjects = db.query(Subject).filter(
         Subject.teacher_id == teacher.teacher_id
-    ).order_by(Subject.subject_name).all()
+    ).order_by(
+        Subject.subject_name
+    ).all()
 
     return templates.TemplateResponse(
         request=request,

@@ -6,16 +6,22 @@
     <title>Take Attendance | CampusTrack</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
     <div class="dashboard">
 
+        <!-- Sidebar -->
         <aside class="sidebar">
             <h2>CampusTrack</h2>
 
             <nav>
                 <a href="/teacher">Dashboard</a>
-                <a href="/take-attendance" class="active">Take Attendance</a>
-                <a href="/attendance-records">Attendance Records</a>
+                <a href="/take-attendance" class="active">
+                    Take Attendance
+                </a>
+                <a href="/attendance-records">
+                    Attendance Records
+                </a>
             </nav>
 
             <div class="sidebar-footer">
@@ -23,6 +29,8 @@
             </div>
         </aside>
 
+
+        <!-- Main Content -->
         <main class="dashboard-content">
 
             <header class="dashboard-header">
@@ -37,6 +45,8 @@
                 </div>
             </header>
 
+
+            <!-- Attendance Panel -->
             <section class="attendance-panel">
 
                 <div class="panel-heading">
@@ -46,25 +56,38 @@
                     </div>
                 </div>
 
+
                 <form action="/save-attendance" method="POST">
 
+                    <!-- Attendance Details -->
                     <div class="attendance-details">
 
                         <div class="form-group">
                             <label for="subject">Subject</label>
 
-                            <select id="subject" name="subject_id" required>
-                                <option value="">Select Subject</option>
-                                <option value="1">Data Structure</option>
-                                <option value="2">HTML, VBScript & JavaScript</option>
-                                <option value="3">Cloud Security</option>
-                                <option value="4">DS Lab</option>
-                                <option value="5">HTML/JavaScript Lab</option>
+                            <select
+                                id="subject"
+                                name="subject_id"
+                                required
+                            >
+                                <option value="">
+                                    Select Subject
+                                </option>
+
+                                {% for subject in subjects %}
+                                <option value="{{ subject.subject_id }}">
+                                    {{ subject.subject_name }}
+                                </option>
+                                {% endfor %}
+
                             </select>
                         </div>
 
+
                         <div class="form-group">
-                            <label for="date">Attendance Date</label>
+                            <label for="date">
+                                Attendance Date
+                            </label>
 
                             <input
                                 type="date"
@@ -73,6 +96,7 @@
                                 required
                             >
                         </div>
+
 
                         <div class="form-group">
                             <label for="period">Period</label>
@@ -90,10 +114,13 @@
 
                     </div>
 
+
+                    <!-- Students -->
                     <div class="student-list-heading">
                         <h3>Students</h3>
                         <span>Choose attendance status</span>
                     </div>
+
 
                     <div class="student-list">
 
@@ -101,36 +128,53 @@
 
                         <div class="student-row">
 
+                            <!-- Student Information -->
                             <div class="student-info">
+
                                 <span class="student-avatar">
                                     {{ student.full_name[0] }}
                                 </span>
 
                                 <div>
-                                    <strong>{{ student.full_name }}</strong>
-                                    <small>{{ student.register_number }}</small>
+                                    <strong>
+                                        {{ student.full_name }}
+                                    </strong>
+
+                                    <small>
+                                        {{ student.register_number }}
+                                    </small>
                                 </div>
+
                             </div>
 
+
+                            <!-- Attendance Options -->
                             <div class="attendance-options">
 
                                 <label class="status-option present-option">
+
                                     <input
                                         type="radio"
                                         name="status_{{ student.student_id }}"
                                         value="P"
                                         checked
                                     >
+
                                     <span>Present</span>
+
                                 </label>
 
+
                                 <label class="status-option absent-option">
+
                                     <input
                                         type="radio"
                                         name="status_{{ student.student_id }}"
                                         value="A"
                                     >
+
                                     <span>Absent</span>
+
                                 </label>
 
                             </div>
@@ -147,14 +191,24 @@
 
                     </div>
 
+
+                    <!-- Buttons -->
                     <div class="attendance-actions">
-                        <a href="/teacher" class="button button-secondary">
+
+                        <a
+                            href="/teacher"
+                            class="button button-secondary"
+                        >
                             Back to Dashboard
                         </a>
 
-                        <button type="submit" class="button">
+                        <button
+                            type="submit"
+                            class="button"
+                        >
                             Save Attendance
                         </button>
+
                     </div>
 
                 </form>
@@ -162,6 +216,7 @@
             </section>
 
         </main>
+
     </div>
 </body>
 </html>
