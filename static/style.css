@@ -741,3 +741,24 @@ body {
         padding: 12px;
     }
 }
+/* Mobile attendance layout */
+@media (max-width: 600px) {
+    .student-row {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .attendance-options {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .status-option {
+        flex: 1;
+        justify-content: center;
+        min-width: 100px;
+        box-sizing: border-box;
+    }
+}
